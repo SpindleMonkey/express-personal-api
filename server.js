@@ -54,7 +54,7 @@ app.get('/api', function api_index(req, res) {
  * SERVER *
  **********/
 
-// listen on port 3000
+// listen on port 3000 (or if live, on whichever port Heroku wants va process.env)
 app.listen(process.env.PORT || 3000, function () {
   console.log('Express server is up and running on http://localhost:3000/');
 });
