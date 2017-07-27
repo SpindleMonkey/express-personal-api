@@ -50,5 +50,11 @@ table,
 th, 
 td {
   border: 2px solid #474b4f;
-  padding: 3px;
+  padding: 5px;
+}
+
+th,
+td {
+  text-align: left;
+  vertical-align: top;
 }

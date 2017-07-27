@@ -1,4 +1,4 @@
-console.log("Sanity Check: JS is working!");
+//console.log("Sanity Check: JS is working!");
 
 $(document).ready(function() {
 
@@ -14,6 +14,13 @@ $(document).ready(function() {
     url: '/api',
     success: handleApiSuccess,
     error: handleApiError
+  });
+
+  $.ajax({
+    method: 'GET',
+    url: '/api/travel',
+    success: handleTravelSuccess,
+    error: handleTravelError
   });
 
 });
@@ -37,8 +44,8 @@ function handleSuccess(json) {
   // build the techy stuff:
   $('#profileText').append('<p>' + json.name + ' is ' + 
       json.days_old + ' days old, and lives in ' + json.current_city + '.</p><p>' +
-      listMonkies + '</p><p>Find her code at <a href=\'' + json.github_link + '\'>' +
-      json.github_link + '</a>.</p>');
+      listMonkies + '</p><p>She also has <a href=\'travel.html\'>travel plans.</a></p>' + 
+      '<p>Find her code at <a href=\'' + json.github_link + '\'>' + json.github_link + '</a>.</p>');
 }
 
 function handleError(e) {
@@ -47,8 +54,8 @@ function handleError(e) {
 }
 
 function handleApiSuccess(json) {
-  console.log(json);
-  console.log(json.message);
+  //console.log(json);
+  //console.log(json.message);
 
   $('#docTitle').append('<p>' + json.message + '</p>');
   $('#docUrl').append('<p>Documentation URL: ' + json.documentation_url + '</p>');
@@ -70,4 +77,33 @@ function handleApiSuccess(json) {
 function handleApiError(json) {
   console.log('uh oh, part 2');
   $('#docText').text('Failed to load /api; is the server working?');
+}
+
+function handleTravelSuccess(json) {
+  //var tableHead = '<table><thead><th>Where</th><th>Why</th><th>When</th><th>More why</th></thead>';
+  var tableHead = '<table><thead><th>Where</th><th>Why</th><th>When</th></thead>';
+  var tableEnd = '</table>';
+  var tableBody = '';
+  var travelImg = '';
+
+  for (var i = 0; i < json.travels.length; i++) {
+    // if (json.travels[i].image) {
+    //   travelImg = '<a href==\'' + json.travels[i].image + '\' >here\'s why</a>';
+    // } else {
+    //   travelImg = 'n/a';
+    // }
+
+    // tableBody = tableBody + '<tr><td>' + json.travels[i].where + '</td><td>' +
+    //     json.travels[i].why + '</td><td>' + json.travels[i].when + '</td><td>' +
+    //     travelImg + '</td></tr>';
+
+    tableBody = tableBody + '<tr><td>' + json.travels[i].where + '</td><td>' +
+        json.travels[i].why + '</td><td>' + json.travels[i].when + '</td></tr>';
+  }
+  $('#travelTable').append(tableHead + tableBody + tableEnd);
+}
+
+function handleTravelError(json) {
+  console.log('uh oh, part 3');
+  $('#travelText').text('Failed to load /api/travel; is the server working?');
 }

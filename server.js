@@ -35,6 +35,10 @@ app.get('/doc.html', function apipage(req, res) {
   res.sendFile(__dirname + '/views/doc.html');
 });
 
+app.get('/travel.html', function travelpage(req, res) {
+  res.sendFile(__dirname + '/views/travel.html');
+});
+
 
 /*
  * JSON API Endpoints
