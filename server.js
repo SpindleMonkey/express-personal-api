@@ -31,6 +31,10 @@ app.get('/', function homepage(req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
+app.get('/doc.html', function apipage(req, res) {
+  res.sendFile(__dirname + '/views/doc.html');
+});
+
 
 /*
  * JSON API Endpoints

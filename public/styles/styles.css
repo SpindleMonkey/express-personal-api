@@ -4,7 +4,7 @@
  * lime green: #86c232;
  * carbon: #222629;
  * charcoal: #474b4f;
- * silver:; #6b6e70;
+ * silver: #6b6e70;
  */
 
 
@@ -36,4 +36,19 @@ a:hover {
 img {
   display: block;
   margin: 30px auto;
+}
+
+p {
+  margin: 20px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table, 
+th, 
+td {
+  border: 2px solid #474b4f;
+  padding: 3px;
 }

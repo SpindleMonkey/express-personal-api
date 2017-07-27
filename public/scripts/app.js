@@ -9,6 +9,13 @@ $(document).ready(function() {
     error: handleError
   });
 
+  $.ajax({
+    method: 'GET',
+    url: '/api',
+    success: handleApiSuccess,
+    error: handleApiError
+  });
+
 });
 
 // helper functions
@@ -34,22 +41,33 @@ function handleSuccess(json) {
       json.github_link + '</a>.</p>');
 }
 
-  //  name: 'Connie',
-  //   days_old: ageInDays,
-  //   github_link: 'https://github.com/SpindleMonkey',
-  //   github_profile_image: 'https://avatars2.githubusercontent.com/u/3019766?v=4&u=bb613c37678dc30dc8d010d3d6b6dd1c762c7fc5&s=400',
-  //   current_city: 'Coal Creek Canyon in unincorporated Jefferson County',
-  //   pets: [
-  //     {name: 'Winterfyre Anastasia', nickname: 'Annie', age: 16, gender: 'female', type: 'cat', breed: 'Norwegian Forest Cat'},
-  //     {name: 'Winterfyre Winterfyre Oskar Sylvanus', nickname: 'Oskar', age: 13, gender: 'male', type: 'cat', breed: 'Norwegian Forest Cat'},
-  //     {name: 'Winterfyre Zelda Gypsydottir', nickname: 'Zelda', age: 12, gender: 'female', type: 'cat', breed: 'Norwegian Forest Cat'},
-  //     {name: 'Lost Woods Galia', nickname: 'Ollie', age: 9, gender: 'female', type: 'cat', breed: 'Norwegian Forest Cat'},
-  //   ],
-  // }
-
-
-
 function handleError(e) {
   console.log('uh oh');
-  $('#profileText').text('Failed to load profile, is the server working?');
+  $('#profileText').text('Failed to load profile; is the server working?');
+}
+
+function handleApiSuccess(json) {
+  console.log(json);
+  console.log(json.message);
+
+  $('#docTitle').append('<p>' + json.message + '</p>');
+  $('#docUrl').append('<p>Documentation URL: ' + json.documentation_url + '</p>');
+  $('#baseUrl').append('<p>Base URL: ' + json.base_url + '</p>');
+
+  // now dump the endpoints in the table
+  var tableHead = '<table><thead><th>Method</th><th>Path</th><th>Description</th></thead>';
+  var tableEnd = '</table>';
+  var tableBody = '';
+
+  for (var i = 0; i < json.endpoints.length; i++) {
+    tableBody = tableBody + '<tr><td>' + json.endpoints[i].method + '</td><td>' +
+        json.endpoints[i].path + '</td><td>' + json.endpoints[i].description + '</td></tr>';
+  }
+
+  $('#apiTable').append(tableHead + tableBody + tableEnd);
+}
+
+function handleApiError(json) {
+  console.log('uh oh, part 2');
+  $('#docText').text('Failed to load /api; is the server working?');
 }
