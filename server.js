@@ -44,7 +44,7 @@ app.get('/travel.html', function travelpage(req, res) {
  * JSON API Endpoints
  */
 
-app.get('/api', function api_index(req, res) {
+app.get('/api', function(req, res) {
   // TODO: Document all your api endpoints below
   res.json({
     message: 'Welcome to my personal api! Here\'s what you need to know:',
@@ -56,13 +56,13 @@ app.get('/api', function api_index(req, res) {
       {method: 'GET', path: '/api/travel', description: 'My travel wish list'},
       {method: 'GET', path: '/api/travel/:where', description: 'Show any destinations matching \'where\' in my travel wish list'},
       {method: 'POST', path: '/api/travel', description: 'Add another destination to my travel wish list'},
-      {method: 'PUT', path: '/api/travel/:id', description: 'Update one of my travel destinations'},
-      {method: 'DELETE', path: '/api/travel/:id', description: 'Remove one of my travel destinations'},
+      {method: 'PUT', path: '/api/travel/:where', description: 'Update the travel destination that matches \'where\''},
+      {method: 'DELETE', path: '/api/travel/:where', description: 'Remove the travel destination that matches \'where\''},
     ]
   });
 });
 
-app.get('/api/profile', function apiProfile(req, res) {
+app.get('/api/profile', function(req, res) {
   
   // that first big number is the number of days from January 17, 1962 to June 30, 2017
   // being lazy and assuming you'll grade this in July, so just adding days from July
@@ -84,38 +84,46 @@ app.get('/api/profile', function apiProfile(req, res) {
   });
 });
 
-app.get('/api/travel', function apiTravelIndex(req, res) {
+app.get('/api/travel', function(req, res) {
   db.Travel.find({}, function(err, travels) {
     if (err) { return console.log("ERROR::" + err); }
     res.json({travels: travels});
   });
 });
 
-app.get('/api/travel/:where', function apiTravelShow(req, res) {
+app.get('/api/travel/:where', function(req, res) {
   db.Travel.find({where: req.params.where}, function(err, travels) {
     if (err) { return console.log("ERROR::" + err); }
     res.json({travels: travels});
   });
 });
 
-app.post('/api/travel', function apiTravelNew(req, res) {
+app.post('/api/travel', function(req, res) {
   console.log(req.body);
   // check the new destination: must have where and why; when and image are optional
   if (req.body.where && req.body.why) {
+    console.log(req.body.where);
+    console.log(req.body.why);
     var newTravel = db.Travel({
       where: req.body.where,
       why: req.body.why,
-      when: req.body.when,
-      image: req.body.image
+      when: req.body.when || "",
+      image: req.body.image || ""
     });
-    newTravel.save(function(err, travel) {
-      if (err) { res.send('ERROR::' + err); }
+    console.log(newTravel);
+    console.log('img: ' + newTravel.image);
+    newTravel.create(function(err, travel) {
+      if (err) { res.status(503).send('ERROR::' + err); }
       res.json(travel);
     });
+  } else {
+    console.log(req.body.where);
+    console.log(req.body.why);
+    res.status(400).send('ERROR::must specify \'where\' and \'why\'');
   }
 });
 
-app.put('/api/travel/:where', function apiTravelUpdate(req, res) {
+app.put('/api/travel/:where', function(req, res) {
   console.log(req.params.where);
   console.log(req.body);
   // db.Travel.find({where: req.params.where}, function(err, travel) {
@@ -126,7 +134,7 @@ app.put('/api/travel/:where', function apiTravelUpdate(req, res) {
   //     res.json(travel);
   //   });
   // });
-  db.Travel.findOneAndUpdate({where: req.params.where}, req.body, function(err, travel) {
+  db.Travel.findOneAndUpdate({where: req.params.where}, { '$set': req.body }, { returnNewDocument: true}, function(err, travel) {
     console.log(travel);
     if (err) { res.status(404).send('ERROR::' + err); }
     res.json(travel);
@@ -135,10 +143,14 @@ app.put('/api/travel/:where', function apiTravelUpdate(req, res) {
 });
 
 app.delete('/api/travel/:where', function apiTravelRemove(req, res) {
-  db.Travel.remove({where: req.params.where}, function(err, travel) {
-    if (err) { res.status(404).send('ERROR::' + err); }
-    res.send(req.params.where + ' has been removed');
-  });
+  if (req.params.where) {
+    db.Travel.remove({where: req.params.where}, function(err, travel) {
+      if (err) { res.status(404).send('ERROR::' + err); }
+      res.send(req.params.where + ' has been removed');
+    });
+  } else {
+    res.status(404).send('ERROR::travel location not found');
+  }
 });
 
 /**********
